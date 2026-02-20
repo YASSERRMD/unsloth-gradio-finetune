@@ -1,0 +1,5 @@
+{"id": "1", "prompt": "What is the capital of France?", "expected": "Paris"}
+{"id": "2", "prompt": "Explain gradient descent in one sentence.", "expected": null}
+{"id": "3", "prompt": "Write a Python function to reverse a string.", "expected": null}
+{"id": "4", "prompt": "Translate to Arabic: Hello, how are you?", "expected": null}
+{"id": "5", "prompt": "Summarize: The quick brown fox jumps over the lazy dog.", "expected": null}

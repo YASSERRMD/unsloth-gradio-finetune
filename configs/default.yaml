@@ -1,0 +1,40 @@
+model:
+  base_model: "unsloth/llama-3.1-8b-unsloth-bnb-4bit"
+  max_seq_length: 2048
+  dtype: null
+  load_in_4bit: true
+
+lora:
+  r: 16
+  alpha: 16
+  dropout: 0.0
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  bias: none
+  gradient_checkpointing: "unsloth"
+
+training:
+  epochs: 3
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0002
+  warmup_steps: 5
+  optim: "adamw_8bit"
+  lr_scheduler_type: "linear"
+  seed: 42
+  fp16: false
+  bf16: true
+
+export:
+  gguf_quant_methods:
+    - "q4_k_m"
+    - "q8_0"
+  push_adapter: true
+  push_merged: true
+  push_gguf: true
