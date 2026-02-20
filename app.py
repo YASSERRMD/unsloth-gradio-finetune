@@ -615,13 +615,45 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
         quant_methods = gr.Textbox(
             label="GGUF Quant Methods (comma-separated)", value="q4_k_m,q8_0"
         )
-        push_btn = gr.Button("🚀 Push All (Adapter + Merged + GGUF)", variant="primary")
+        with gr.Row():
+            push_btn = gr.Button(
+                "🚀 Push All (Adapter + Merged + GGUF)", variant="primary"
+            )
+            export_local_btn = gr.Button("💾 Export GGUF Locally", variant="secondary")
         push_logs = gr.Textbox(label="Push Logs", lines=12, interactive=False)
+        local_export_logs = gr.Textbox(
+            label="Local Export Logs", lines=8, interactive=False
+        )
 
         push_btn.click(
             do_push_all,
             [export_run_dir, export_hf_username, export_run_name, quant_methods],
             [push_logs],
+            concurrency_limit=1,
+        )
+
+        def do_export_gguf_local(run_dir, quant_method):
+            try:
+                from src.export import export_gguf_local
+                from unsloth import FastLanguageModel
+
+                adapter_path = os.path.join(run_dir, "artifacts", "lora")
+                model, tokenizer = FastLanguageModel.from_pretrained(
+                    model_name=adapter_path,
+                    max_seq_length=2048,
+                    dtype=None,
+                    load_in_4bit=True,
+                )
+
+                out_path = export_gguf_local(run_dir, model, tokenizer, quant_method)
+                return f"✅ GGUF exported to: {out_path}"
+            except Exception:
+                return traceback.format_exc()
+
+        export_local_btn.click(
+            do_export_gguf_local,
+            [export_run_dir, quant_methods],
+            [local_export_logs],
             concurrency_limit=1,
         )
 
