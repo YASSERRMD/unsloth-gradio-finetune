@@ -259,6 +259,8 @@ def do_eval(run_dir):
 
 def do_push_all(run_dir, hf_username, run_name, quant_methods_str):
     try:
+        from src.paths import save_export_manifest
+
         token = require_token()
         quant_methods = [q.strip() for q in quant_methods_str.split(",")]
         results = []
@@ -280,6 +282,18 @@ def do_push_all(run_dir, hf_username, run_name, quant_methods_str):
         url = push_gguf(run_dir, gguf_repo, token, quant_methods)
         results.append(f"✅ GGUF: {url}")
         yield "\n".join(results) + "\n"
+
+        export_manifest = {
+            "lora_repo": lora_repo,
+            "lora_url": results[0].split(": ")[1] if results else None,
+            "merged_repo": merged_repo,
+            "merged_url": results[1].split(": ")[1] if len(results) > 1 else None,
+            "gguf_repo": gguf_repo,
+            "gguf_url": results[2].split(": ")[1] if len(results) > 2 else None,
+            "quant_methods": quant_methods,
+        }
+        save_export_manifest(run_dir, export_manifest)
+        yield "\n✅ Export manifest saved."
 
     except Exception:
         yield traceback.format_exc()
