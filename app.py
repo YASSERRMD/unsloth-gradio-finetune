@@ -232,6 +232,13 @@ def do_train(*args):
         "col_system": args[26],
     }
     try:
+        import shutil
+
+        total, used, free = shutil.disk_usage("/")
+        free_gb = free // (2**30)
+        if free_gb < 10:
+            yield f"⚠️ Warning: Low disk space! Only {free_gb}GB free. Training may fail."
+
         logs = ""
 
         def on_log(line):
@@ -259,7 +266,13 @@ def do_eval(run_dir):
 
 def do_push_all(run_dir, hf_username, run_name, quant_methods_str):
     try:
+        import shutil
         from src.paths import save_export_manifest
+
+        total, used, free = shutil.disk_usage("/")
+        free_gb = free // (2**30)
+        if free_gb < 15:
+            yield f"⚠️ Warning: Low disk space! Only {free_gb}GB free. Merging may fail."
 
         token = require_token()
         quant_methods = [q.strip() for q in quant_methods_str.split(",")]

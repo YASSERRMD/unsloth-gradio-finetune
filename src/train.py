@@ -2,7 +2,6 @@ import os
 import json
 import threading
 from typing import Callable
-from transformers import TrainerCallback
 
 import torch
 from unsloth import FastLanguageModel
@@ -19,7 +18,16 @@ def run_sft(
     cfg: dict, dataset_spec: dict, cancel_flag: threading.Event, on_log: Callable
 ) -> str:
     run_dir = new_run(cfg)
-    save_config(run_dir, cfg)
+
+    reproducibility_info = {
+        "unsloth_version": "latest",
+        "transformers_version": "4.38.0",
+        "torch_version": torch.__version__,
+        "seed": cfg.get("seed", 42),
+    }
+    cfg_with_repro = {**cfg, **reproducibility_info}
+
+    save_config(run_dir, cfg_with_repro)
     on_log(f"Run dir: {run_dir}")
 
     on_log("Loading model...")
