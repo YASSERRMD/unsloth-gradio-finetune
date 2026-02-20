@@ -359,12 +359,49 @@ def do_chat(message, history, run_dir, max_new_tokens):
 
 
 MODELS = [
+    # Llama 3.1
     "unsloth/llama-3.1-8b-unsloth-bnb-4bit",
-    "unsloth/llama-3.1-70b-bnb-4bit",
+    "unsloth/llama-3.1-70b-unsloth-bnb-4bit",
+    "unsloth/llama-3.1-405b-unsloth-bnb-4bit",
+    # Llama 3
+    "unsloth/llama-3-8b-bnb-4bit",
+    "unsloth/llama-3-70b-bnb-4bit",
+    # Qwen 2.5
+    "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
     "unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
+    # Mistral
     "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
+    "unsloth/mistral-7b-v0.3-bnb-4bit",
+    # Gemma 2
+    "unsloth/gemma-2-2b-bnb-4bit",
     "unsloth/gemma-2-9b-bnb-4bit",
+    "unsloth/gemma-2-27b-bnb-4bit",
+    # Phi-3
+    "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
+    "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
+    # Phi-4
+    "unsloth/Phi-4-mini-instruct-bnb-4bit",
     "unsloth/Phi-4",
+    # Yi
+    "unsloth/Yi-1.5-6B-Chat-bnb-4bit",
+    "unsloth/Yi-1.5-9B-Chat-bnb-4bit",
+    "unsloth/Yi-1.5-34B-Chat-bnb-4bit",
+    # DeepSeek
+    "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
+    "unsloth/DeepSeek-V2-Chat-bnb-4bit",
+    # Command-R
+    "unsloth/Command-R7B-8k-bnb-4bit",
+    # Falcon
+    "unsloth/falcon-7b-instruct-bnb-4bit",
+    # Starling
+    "unsloth/Starling-LM-7B-alpha-bnb-4bit",
+    # OLMo
+    "unsloth/OLMo-7B-Instruct-bnb-4bit",
 ]
 
 with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as demo:
