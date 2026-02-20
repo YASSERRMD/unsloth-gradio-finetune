@@ -12,6 +12,9 @@ from src.eval import run_eval, run_prompt_suite
 from src.hub import push_lora, push_merged, push_gguf
 from src.export import merge_to_local
 from src.paths import list_runs
+from src.schema import CanonicalRecord
+
+import pandas as pd
 
 _cancel_flag = threading.Event()
 _loaded_model = None
@@ -94,6 +97,124 @@ def do_preview_upload(file_obj):
         )
     except Exception as e:
         return None, None, None, str(e)
+
+
+def do_normalize_preview(
+    ds_name,
+    subset,
+    split,
+    upload_file,
+    dataset_mode,
+    col_format,
+    col_user,
+    col_assistant,
+    col_system,
+):
+    try:
+        if dataset_mode == "HF Dataset":
+            df, _ = load_hf_dataset(ds_name, subset or None, split)
+            records = df.to_dict("records")
+        else:
+            path = (
+                upload_file
+                if isinstance(upload_file, str)
+                else save_uploaded_file(upload_file, "runs/uploads")
+            )
+            df, _ = load_local_file(path)
+            records = df.to_dict("records")
+
+        column_map = None
+        if col_format == "csv_custom":
+            column_map = {
+                "user": col_user,
+                "assistant": col_assistant,
+                "system": col_system,
+            }
+
+        normalized = normalize(records, fmt=col_format, column_map=column_map)
+
+        preview_data = []
+        for rec in normalized[:20]:
+            if rec.messages:
+                preview_data.append(
+                    {
+                        "id": rec.id,
+                        "messages": f"{len(rec.messages)} turns",
+                        "preview": rec.messages[0].content[:100] + "..."
+                        if rec.messages
+                        else "",
+                    }
+                )
+            else:
+                preview_data.append(
+                    {
+                        "id": rec.id,
+                        "messages": "completion",
+                        "preview": rec.meta.get("text", "")[:100] + "...",
+                    }
+                )
+
+        preview_df = pd.DataFrame(preview_data)
+        return preview_df
+    except Exception as e:
+        return pd.DataFrame([{"error": str(e)}])
+
+
+def do_render_preview(
+    ds_name,
+    subset,
+    split,
+    upload_file,
+    dataset_mode,
+    col_format,
+    col_user,
+    col_assistant,
+    col_system,
+    base_model,
+):
+    try:
+        if dataset_mode == "HF Dataset":
+            df, _ = load_hf_dataset(ds_name, subset or None, split)
+            records = df.to_dict("records")
+        else:
+            path = (
+                upload_file
+                if isinstance(upload_file, str)
+                else save_uploaded_file(upload_file, "runs/uploads")
+            )
+            df, _ = load_local_file(path)
+            records = df.to_dict("records")
+
+        column_map = None
+        if col_format == "csv_custom":
+            column_map = {
+                "user": col_user,
+                "assistant": col_assistant,
+                "system": col_system,
+            }
+
+        normalized = normalize(records, fmt=col_format, column_map=column_map)
+
+        from unsloth import FastLanguageModel
+
+        _, tokenizer = FastLanguageModel.from_pretrained(
+            model_name=base_model,
+            max_seq_length=2048,
+            dtype=None,
+            load_in_4bit=True,
+        )
+
+        train_dataset = render_for_training(normalized, tokenizer)
+
+        render_data = []
+        for i, text in enumerate(train_dataset["text"][:5]):
+            render_data.append(
+                {"idx": i, "text": text[:500] + "..." if len(text) > 500 else text}
+            )
+
+        return pd.DataFrame(render_data)
+    except Exception as e:
+        return pd.DataFrame([{"error": str(e)}])
 
 
 def do_train(*args):
@@ -284,6 +405,8 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
                 hf_subset = gr.Textbox(label="Subset (optional)")
                 hf_split = gr.Textbox(label="Split", value="train")
             preview_hf_btn = gr.Button("Preview Dataset", variant="secondary")
+            normalize_btn = gr.Button("Normalize & Preview", variant="secondary")
+            render_btn = gr.Button("Render Training Text", variant="secondary")
 
         with gr.Group(visible=False) as upload_group:
             upload_file = gr.File(label="Upload (.json / .jsonl / .csv)")
@@ -327,6 +450,45 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
             do_preview_upload,
             [upload_file],
             [preview_df, col_user, col_assistant, col_system],
+            concurrency_limit=4,
+        )
+
+        gr.Markdown("### Normalized Preview")
+        normalize_preview_df = gr.Dataframe(label="Normalized Records")
+        normalize_btn.click(
+            do_normalize_preview,
+            [
+                hf_ds_name,
+                hf_subset,
+                hf_split,
+                upload_file,
+                dataset_mode,
+                col_format,
+                col_user,
+                col_assistant,
+                col_system,
+            ],
+            [normalize_preview_df],
+            concurrency_limit=4,
+        )
+
+        gr.Markdown("### Rendered Training Text")
+        render_preview_df = gr.Dataframe(label="Rendered Text (first 5)")
+        render_btn.click(
+            do_render_preview,
+            [
+                hf_ds_name,
+                hf_subset,
+                hf_split,
+                upload_file,
+                dataset_mode,
+                col_format,
+                col_user,
+                col_assistant,
+                col_system,
+                base_model,
+            ],
+            [render_preview_df],
             concurrency_limit=4,
         )
 
