@@ -2,6 +2,7 @@ import os
 import json
 import threading
 from typing import Callable
+from transformers import TrainerCallback
 
 import torch
 from unsloth import FastLanguageModel
@@ -41,6 +42,7 @@ def run_sft(
     )
     on_log("Model loaded and LoRA applied.")
     if cancel_flag.is_set():
+        on_log("Cancelled after model load.")
         return run_dir
 
     on_log("Loading dataset...")
@@ -111,6 +113,7 @@ def run_sft(
         logging_dir=os.path.join(run_dir, "artifacts", "logs"),
         logging_steps=10,
         save_strategy="epoch",
+        report_to="none",
     )
 
     trainer = SFTTrainer(
@@ -121,7 +124,12 @@ def run_sft(
     )
 
     on_log("Starting training...")
-    trainer.train()
+    for step in range(int(cfg["epochs"])):
+        if cancel_flag.is_set():
+            on_log(f"Cancelled at epoch {step + 1}")
+            break
+        trainer.train()
+        on_log(f"Epoch {step + 1} completed")
 
     on_log("Saving adapter...")
     model.save_pretrained(adapter_path)
