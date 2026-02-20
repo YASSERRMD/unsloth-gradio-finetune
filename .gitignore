@@ -1,0 +1,31 @@
+# Runtime artifacts
+runs/
+*.safetensors
+*.bin
+*.gguf
+*.pt
+*.ckpt
+
+# Secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Guide file (keep locally, don't commit)
+unsloth_gradio_finetuner_guide.md
