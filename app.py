@@ -415,58 +415,157 @@ def get_unsloth_models():
 def get_model_families():
     """Group models by family for dropdown."""
     families = {
+        # Llama
+        "Llama 4": [
+            "unsloth/Llama-4-Scout-17B-16E-Instruct",
+            "unsloth/Llama-4-Maverick-17B-128E-Instruct",
+        ],
+        "Llama 3.3": [
+            "unsloth/Llama-3.3-70B-Instruct",
+        ],
+        "Llama 3.2": [
+            "unsloth/Llama-3.2-1B-Instruct",
+            "unsloth/Llama-3.2-3B-Instruct",
+            "unsloth/Llama-3.2-11B-Vision-Instruct",
+            "unsloth/Llama-3.2-90B-Vision-Instruct",
+        ],
         "Llama 3.1": [
-            "unsloth/llama-3.1-8b-unsloth-bnb-4bit",
-            "unsloth/llama-3.1-70b-unsloth-bnb-4bit",
-            "unsloth/llama-3.1-405b-unsloth-bnb-4bit",
+            "unsloth/Meta-Llama-3.1-8B-Instruct",
+            "unsloth/Meta-Llama-3.1-70B-Instruct",
+            "unsloth/Meta-Llama-3.1-405B-Instruct",
         ],
         "Llama 3": [
-            "unsloth/llama-3-8b-bnb-4bit",
+            "unsloth/llama-3-8b-Instruct",
             "unsloth/llama-3-70b-bnb-4bit",
         ],
-        "Qwen 2.5": [
-            "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
-            "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit",
-            "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
-            "unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
-            "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
-            "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
-            "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
+        "Llama 2": [
+            "unsloth/llama-2-7b-chat-bnb-4bit",
+            "unsloth/llama-2-13b-bnb-4bit",
         ],
+        "CodeLlama": [
+            "unsloth/codellama-7b-bnb-4bit",
+            "unsloth/codellama-13b-bnb-4bit",
+            "unsloth/codellama-34b-bnb-4bit",
+        ],
+        # Qwen
+        "Qwen 3": [
+            "unsloth/Qwen3-0.6B",
+            "unsloth/Qwen3-1.7B",
+            "unsloth/Qwen3-4B",
+            "unsloth/Qwen3-8B",
+            "unsloth/Qwen3-14B",
+            "unsloth/Qwen3-30B-A3B",
+            "unsloth/Qwen3-32B",
+        ],
+        "Qwen 3 VL": [
+            "unsloth/Qwen3-VL-2B-Instruct",
+            "unsloth/Qwen3-VL-4B-Instruct",
+            "unsloth/Qwen3-VL-8B-Instruct",
+            "unsloth/Qwen3-VL-32B-Instruct",
+        ],
+        "Qwen 2.5": [
+            "unsloth/Qwen2.5-0.5B-Instruct",
+            "unsloth/Qwen2.5-1.5B-Instruct",
+            "unsloth/Qwen2.5-3B-Instruct",
+            "unsloth/Qwen2.5-7B-Instruct",
+            "unsloth/Qwen2.5-14B-Instruct",
+            "unsloth/Qwen2.5-32B-Instruct",
+            "unsloth/Qwen2.5-72B-Instruct",
+        ],
+        "Qwen 2.5 VL": [
+            "unsloth/Qwen2.5-VL-3B-Instruct",
+            "unsloth/Qwen2.5-VL-7B-Instruct",
+            "unsloth/Qwen2.5-VL-32B-Instruct",
+            "unsloth/Qwen2.5-VL-72B-Instruct",
+        ],
+        "Qwen 2.5 Coder": [
+            "unsloth/Qwen2.5-Coder-0.5B-Instruct",
+            "unsloth/Qwen2.5-Coder-1.5B-Instruct",
+            "unsloth/Qwen2.5-Coder-3B-Instruct",
+            "unsloth/Qwen2.5-Coder-7B-Instruct",
+            "unsloth/Qwen2.5-Coder-14B-Instruct",
+        ],
+        # Mistral
         "Mistral": [
             "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
             "unsloth/mistral-7b-v0.3-bnb-4bit",
         ],
-        "Gemma 2": [
-            "unsloth/gemma-2-2b-bnb-4bit",
-            "unsloth/gemma-2-9b-bnb-4bit",
-            "unsloth/gemma-2-27b-bnb-4bit",
+        "Mistral 3": [
+            "unsloth/Ministral-3-3B-Instruct",
+            "unsloth/Ministral-3-8B-Instruct",
+            "unsloth/Ministral-3-14B-Instruct",
         ],
+        "Mistral Large": [
+            "unsloth/Mistral-Large-3-675B-Instruct",
+        ],
+        # Gemma
+        "Gemma 3": [
+            "unsloth/gemma-3-270m-it",
+            "unsloth/gemma-3-1b-it",
+            "unsloth/gemma-3-4b-it",
+            "unsloth/gemma-3-12b-it",
+            "unsloth/gemma-3-27b-it",
+        ],
+        "Gemma 3n": [
+            "unsloth/gemma-3n-E2B-it",
+            "unsloth/gemma-3n-E4B-it",
+        ],
+        "Gemma 2": [
+            "unsloth/gemma-2-2b-it-bnb-4bit",
+            "unsloth/gemma-2-9b-it-bnb-4bit",
+            "unsloth/gemma-2-27b-it-bnb-4bit",
+        ],
+        "CodeGemma": [
+            "unsloth/CodeGemma-7b-bnb-4bit",
+        ],
+        # Phi
         "Phi": [
             "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
             "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
             "unsloth/Phi-4-mini-instruct-bnb-4bit",
             "unsloth/Phi-4",
         ],
+        # DeepSeek
+        "DeepSeek R1": [
+            "unsloth/DeepSeek-R1-Distill-Llama-8B",
+            "unsloth/DeepSeek-R1-Distill-Llama-70B",
+            "unsloth/DeepSeek-R1-Distill-Qwen-1.5B",
+            "unsloth/DeepSeek-R1-Distill-Qwen-7B",
+            "unsloth/DeepSeek-R1-Distill-Qwen-14B",
+            "unsloth/DeepSeek-R1-Distill-Qwen-32B",
+            "unsloth/DeepSeek-R1-0528-Qwen3-8B",
+        ],
+        "DeepSeek V3": [
+            "unsloth/DeepSeek-V3",
+        ],
+        "DeepSeek Coder": [
+            "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
+            "unsloth/DeepSeek-V2-Chat-bnb-4bit",
+        ],
+        # Yi
         "Yi": [
             "unsloth/Yi-1.5-6B-Chat-bnb-4bit",
             "unsloth/Yi-1.5-9B-Chat-bnb-4bit",
             "unsloth/Yi-1.5-34B-Chat-bnb-4bit",
         ],
-        "DeepSeek": [
-            "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
-            "unsloth/DeepSeek-V2-Chat-bnb-4bit",
+        # Granite
+        "Granite": [
+            "unsloth/granite-4.0-h-small",
         ],
-        "Liquid": [
-            "liquid/liquid-1.6-7b-chat",
-            "liquid/liquid-1.6-8x7b-chat",
-            "liquid/liquid-1.6-70b-chat",
+        # gpt-oss
+        "gpt-oss": [
+            "unsloth/gpt-oss-20b-unsloth-bnb-4bit",
+            "unsloth/gpt-oss-120b-unsloth-bnb-4bit",
         ],
+        # Other
         "Other": [
             "unsloth/Command-R7B-8k-bnb-4bit",
             "unsloth/falcon-7b-instruct-bnb-4bit",
             "unsloth/Starling-LM-7B-alpha-bnb-4bit",
             "unsloth/OLMo-7B-Instruct-bnb-4bit",
+            "liquid/liquid-1.6-7b-chat",
+            "liquid/liquid-1.6-8x7b-chat",
+            "liquid/liquid-1.6-70b-chat",
         ],
     }
     return families
@@ -497,17 +596,19 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
             )
         base_model_family = gr.Dropdown(
             choices=list(get_model_families().keys()),
-            value="Llama 3.1",
+            value="Llama 4",
             label="Model Family",
         )
         base_model = gr.Dropdown(
-            choices=get_model_families()["Llama 3.1"],
-            value="unsloth/llama-3.1-8b-unsloth-bnb-4bit",
+            choices=get_model_families()["Llama 4"],
+            value="unsloth/Llama-4-Scout-17B-16E-Instruct",
             label="Base Model",
         )
 
         def update_models(family):
-            return gr.update(choices=get_model_families().get(family, []))
+            models = get_model_families().get(family, [])
+            default_value = models[0] if models else ""
+            return gr.update(choices=models, value=default_value)
 
         base_model_family.change(update_models, base_model_family, base_model)
 
