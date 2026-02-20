@@ -544,9 +544,54 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
         eval_run_dir = gr.Textbox(
             label="Run Directory", placeholder="runs/my-run-20260220"
         )
-        eval_btn = gr.Button("Run Evaluation", variant="secondary")
+        with gr.Row():
+            eval_btn = gr.Button("Run Evaluation", variant="secondary")
+            prompt_suite_btn = gr.Button("Run Prompt Suite", variant="secondary")
         eval_out = gr.Textbox(label="Metrics", lines=10, interactive=False)
+        prompt_suite_out = gr.Dataframe(label="Prompt Suite Results")
+
         eval_btn.click(do_eval, [eval_run_dir], [eval_out], concurrency_limit=1)
+
+        def do_run_prompt_suite(run_dir):
+            try:
+                from src.eval import run_prompt_suite
+                from unsloth import FastLanguageModel
+                import torch
+
+                adapter_path = os.path.join(run_dir, "artifacts", "lora")
+                model, tokenizer = FastLanguageModel.from_pretrained(
+                    model_name=adapter_path,
+                    max_seq_length=2048,
+                    dtype=None,
+                    load_in_4bit=True,
+                )
+
+                results = run_prompt_suite(model, tokenizer, run_dir)
+
+                df_data = []
+                for r in results:
+                    df_data.append(
+                        {
+                            "prompt": r["prompt"][:50] + "..."
+                            if len(r["prompt"]) > 50
+                            else r["prompt"],
+                            "expected": r.get("expected", ""),
+                            "actual": r["actual"][:100] + "..."
+                            if len(r["actual"]) > 100
+                            else r["actual"],
+                        }
+                    )
+                import pandas as pd
+
+                return pd.DataFrame(df_data)
+            except Exception as e:
+                import pandas as pd
+
+                return pd.DataFrame([{"error": str(e)}])
+
+        prompt_suite_btn.click(
+            do_run_prompt_suite, [eval_run_dir], [prompt_suite_out], concurrency_limit=1
+        )
 
     with gr.Tab("📤 Export"):
         with gr.Row():
