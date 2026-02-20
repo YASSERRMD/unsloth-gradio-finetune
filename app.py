@@ -34,6 +34,7 @@ def build_cfg(
     hf_username,
     run_name,
     base_model,
+    custom_model,
     max_seq,
     dtype,
     load_4bit,
@@ -50,10 +51,11 @@ def build_cfg(
     scheduler,
     seed,
 ):
+    final_model = custom_model if custom_model else base_model
     return {
         "hf_username": hf_username,
         "run_name": run_name,
-        "base_model": base_model,
+        "base_model": final_model,
         "max_seq_length": int(max_seq),
         "dtype": dtype if dtype != "None" else None,
         "load_in_4bit": load_4bit,
@@ -171,6 +173,7 @@ def do_render_preview(
     col_assistant,
     col_system,
     base_model,
+    custom_model,
 ):
     try:
         if dataset_mode == "HF Dataset":
@@ -197,8 +200,10 @@ def do_render_preview(
 
         from unsloth import FastLanguageModel
 
+        final_model = custom_model if custom_model else base_model
+
         _, tokenizer = FastLanguageModel.from_pretrained(
-            model_name=base_model,
+            model_name=final_model,
             max_seq_length=2048,
             dtype=None,
             load_in_4bit=True,
@@ -221,15 +226,15 @@ def do_train(*args):
     _cancel_flag.clear()
     cfg = build_cfg(*args[:18])
     dataset_spec = {
-        "mode": args[18],
-        "hf_dataset": args[19],
-        "subset": args[20],
-        "split": args[21],
-        "upload_path": args[22],
-        "format": args[23],
-        "col_user": args[24],
-        "col_assistant": args[25],
-        "col_system": args[26],
+        "mode": args[19],
+        "hf_dataset": args[20],
+        "subset": args[21],
+        "split": args[22],
+        "upload_path": args[23],
+        "format": args[24],
+        "col_user": args[25],
+        "col_assistant": args[26],
+        "col_system": args[27],
     }
     try:
         import shutil
@@ -358,51 +363,118 @@ def do_chat(message, history, run_dir, max_new_tokens):
         return traceback.format_exc()
 
 
-MODELS = [
-    # Llama 3.1
-    "unsloth/llama-3.1-8b-unsloth-bnb-4bit",
-    "unsloth/llama-3.1-70b-unsloth-bnb-4bit",
-    "unsloth/llama-3.1-405b-unsloth-bnb-4bit",
-    # Llama 3
-    "unsloth/llama-3-8b-bnb-4bit",
-    "unsloth/llama-3-70b-bnb-4bit",
-    # Qwen 2.5
-    "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
-    # Mistral
-    "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
-    "unsloth/mistral-7b-v0.3-bnb-4bit",
-    # Gemma 2
-    "unsloth/gemma-2-2b-bnb-4bit",
-    "unsloth/gemma-2-9b-bnb-4bit",
-    "unsloth/gemma-2-27b-bnb-4bit",
-    # Phi-3
-    "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
-    "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
-    # Phi-4
-    "unsloth/Phi-4-mini-instruct-bnb-4bit",
-    "unsloth/Phi-4",
-    # Yi
-    "unsloth/Yi-1.5-6B-Chat-bnb-4bit",
-    "unsloth/Yi-1.5-9B-Chat-bnb-4bit",
-    "unsloth/Yi-1.5-34B-Chat-bnb-4bit",
-    # DeepSeek
-    "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
-    "unsloth/DeepSeek-V2-Chat-bnb-4bit",
-    # Command-R
-    "unsloth/Command-R7B-8k-bnb-4bit",
-    # Falcon
-    "unsloth/falcon-7b-instruct-bnb-4bit",
-    # Starling
-    "unsloth/Starling-LM-7B-alpha-bnb-4bit",
-    # OLMo
-    "unsloth/OLMo-7B-Instruct-bnb-4bit",
-]
+def get_unsloth_models():
+    """Get list of supported models from Unsloth."""
+    return [
+        # Llama 3.1
+        "unsloth/llama-3.1-8b-unsloth-bnb-4bit",
+        "unsloth/llama-3.1-70b-unsloth-bnb-4bit",
+        "unsloth/llama-3.1-405b-unsloth-bnb-4bit",
+        # Llama 3
+        "unsloth/llama-3-8b-bnb-4bit",
+        "unsloth/llama-3-70b-bnb-4bit",
+        # Qwen 2.5
+        "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
+        "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit",
+        "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
+        "unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
+        "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
+        "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
+        "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
+        # Mistral
+        "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
+        "unsloth/mistral-7b-v0.3-bnb-4bit",
+        # Gemma 2
+        "unsloth/gemma-2-2b-bnb-4bit",
+        "unsloth/gemma-2-9b-bnb-4bit",
+        "unsloth/gemma-2-27b-bnb-4bit",
+        # Phi-3
+        "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
+        "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
+        # Phi-4
+        "unsloth/Phi-4-mini-instruct-bnb-4bit",
+        "unsloth/Phi-4",
+        # Yi
+        "unsloth/Yi-1.5-6B-Chat-bnb-4bit",
+        "unsloth/Yi-1.5-9B-Chat-bnb-4bit",
+        "unsloth/Yi-1.5-34B-Chat-bnb-4bit",
+        # DeepSeek
+        "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
+        "unsloth/DeepSeek-V2-Chat-bnb-4bit",
+        # Command-R
+        "unsloth/Command-R7B-8k-bnb-4bit",
+        # Falcon
+        "unsloth/falcon-7b-instruct-bnb-4bit",
+        # Starling
+        "unsloth/Starling-LM-7B-alpha-bnb-4bit",
+        # OLMo
+        "unsloth/OLMo-7B-Instruct-bnb-4bit",
+    ]
+
+
+def get_model_families():
+    """Group models by family for dropdown."""
+    families = {
+        "Llama 3.1": [
+            "unsloth/llama-3.1-8b-unsloth-bnb-4bit",
+            "unsloth/llama-3.1-70b-unsloth-bnb-4bit",
+            "unsloth/llama-3.1-405b-unsloth-bnb-4bit",
+        ],
+        "Llama 3": [
+            "unsloth/llama-3-8b-bnb-4bit",
+            "unsloth/llama-3-70b-bnb-4bit",
+        ],
+        "Qwen 2.5": [
+            "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
+        ],
+        "Mistral": [
+            "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
+            "unsloth/mistral-7b-v0.3-bnb-4bit",
+        ],
+        "Gemma 2": [
+            "unsloth/gemma-2-2b-bnb-4bit",
+            "unsloth/gemma-2-9b-bnb-4bit",
+            "unsloth/gemma-2-27b-bnb-4bit",
+        ],
+        "Phi": [
+            "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
+            "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
+            "unsloth/Phi-4-mini-instruct-bnb-4bit",
+            "unsloth/Phi-4",
+        ],
+        "Yi": [
+            "unsloth/Yi-1.5-6B-Chat-bnb-4bit",
+            "unsloth/Yi-1.5-9B-Chat-bnb-4bit",
+            "unsloth/Yi-1.5-34B-Chat-bnb-4bit",
+        ],
+        "DeepSeek": [
+            "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
+            "unsloth/DeepSeek-V2-Chat-bnb-4bit",
+        ],
+        "Other": [
+            "unsloth/Command-R7B-8k-bnb-4bit",
+            "unsloth/falcon-7b-instruct-bnb-4bit",
+            "unsloth/Starling-LM-7B-alpha-bnb-4bit",
+            "unsloth/OLMo-7B-Instruct-bnb-4bit",
+        ],
+    }
+    return families
+
+
+def get_all_model_choices():
+    """Get flattened list of all models."""
+    families = get_model_families()
+    all_models = []
+    for family_models in families.values():
+        all_models.extend(family_models)
+    return all_models
+
 
 with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as demo:
     gr.Markdown("# 🦥 Unsloth All-in-One Fine-Tuner")
@@ -418,7 +490,31 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
             run_name = gr.Textbox(
                 label="Run Name", placeholder="llama31-8b-mydata-20260220"
             )
-        base_model = gr.Dropdown(choices=MODELS, value=MODELS[0], label="Base Model")
+        base_model_family = gr.Dropdown(
+            choices=list(get_model_families().keys()),
+            value="Llama 3.1",
+            label="Model Family",
+        )
+        base_model = gr.Dropdown(
+            choices=get_model_families()["Llama 3.1"],
+            value="unsloth/llama-3.1-8b-unsloth-bnb-4bit",
+            label="Base Model",
+        )
+
+        def update_models(family):
+            return gr.update(choices=get_model_families().get(family, []))
+
+        base_model_family.change(update_models, base_model_family, base_model)
+
+        gr.Markdown("Or enter custom model from Hugging Face:")
+        custom_model = gr.Textbox(
+            label="Custom Model (overrides above)",
+            placeholder="e.g., meta-llama/Llama-3.1-8b",
+        )
+
+        def get_selected_model(family_model, custom):
+            return custom if custom else family_model
+
         with gr.Row():
             max_seq = gr.Number(value=2048, label="Max Seq Length")
             dtype = gr.Dropdown(
@@ -551,6 +647,7 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
                 col_assistant,
                 col_system,
                 base_model,
+                custom_model,
             ],
             [render_preview_df],
             concurrency_limit=4,
@@ -573,6 +670,7 @@ with gr.Blocks(title="Unsloth All-in-One Fine-Tuner", theme=gr.themes.Soft()) as
             hf_username,
             run_name,
             base_model,
+            custom_model,
             max_seq,
             dtype,
             load_4bit,
