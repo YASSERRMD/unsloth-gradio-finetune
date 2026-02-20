@@ -457,6 +457,11 @@ def get_model_families():
             "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
             "unsloth/DeepSeek-V2-Chat-bnb-4bit",
         ],
+        "Liquid": [
+            "liquid/liquid-1.6-7b-chat",
+            "liquid/liquid-1.6-8x7b-chat",
+            "liquid/liquid-1.6-70b-chat",
+        ],
         "Other": [
             "unsloth/Command-R7B-8k-bnb-4bit",
             "unsloth/falcon-7b-instruct-bnb-4bit",
