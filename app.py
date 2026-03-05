@@ -18,7 +18,31 @@ import pandas as pd
 
 _cancel_flag = threading.Event()
 _loaded_model = None
+
 _loaded_tokenizer = None
+
+
+NOTEBOOK_MODEL_ALIASES = {
+    "unsloth/Meta-Llama-3.1-8B-Instruct": "unsloth/Llama-3.1-8B-Instruct-bnb-4bit",
+    "unsloth/Meta-Llama-3.1-70B-Instruct": "unsloth/Llama-3.1-70B-bnb-4bit",
+    "unsloth/Meta-Llama-3.1-405B-Instruct": "unsloth/Llama-3.1-405B-bnb-4bit",
+    "unsloth/Llama-3.2-11B-Vision-Instruct": "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+    "unsloth/Llama-3.2-90B-Vision-Instruct": "unsloth/Llama-3.2-90B-Vision-Instruct-bnb-4bit",
+    "unsloth/Llama-3.3-70B-Instruct": "unsloth/Llama-3.3-70B-Instruct-bnb-4bit",
+    "unsloth/llama-3-8b-Instruct": "unsloth/llama-3-8b-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-Coder-0.5B-Instruct": "unsloth/Qwen2.5-Coder-0.5B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-Coder-1.5B-Instruct": "unsloth/Qwen2.5-Coder-1.5B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-Coder-3B-Instruct": "unsloth/Qwen2.5-Coder-3B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-Coder-7B-Instruct": "unsloth/Qwen2.5-Coder-7B-Instruct-bnb-4bit",
+    "unsloth/Qwen2.5-Coder-14B-Instruct": "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit",
+    "unsloth/CodeGemma-7b-bnb-4bit": "unsloth/codegemma-7b-bnb-4bit",
+    "unsloth/Phi-4": "unsloth/phi-4-bnb-4bit",
+}
+
+
+def resolve_model_name(model_name):
+    model_name = (model_name or "").strip()
+    return NOTEBOOK_MODEL_ALIASES.get(model_name, model_name)
 
 
 def require_token():
@@ -51,7 +75,7 @@ def build_cfg(
     scheduler,
     seed,
 ):
-    final_model = custom_model if custom_model else base_model
+    final_model = resolve_model_name(custom_model if custom_model else base_model)
     return {
         "hf_username": hf_username,
         "run_name": run_name,
@@ -200,7 +224,7 @@ def do_render_preview(
 
         from unsloth import FastLanguageModel
 
-        final_model = custom_model if custom_model else base_model
+        final_model = resolve_model_name(custom_model if custom_model else base_model)
 
         _, tokenizer = FastLanguageModel.from_pretrained(
             model_name=final_model,
@@ -364,52 +388,8 @@ def do_chat(message, history, run_dir, max_new_tokens):
 
 
 def get_unsloth_models():
-    """Get list of supported models from Unsloth."""
-    return [
-        # Llama 3.1
-        "unsloth/llama-3.1-8b-unsloth-bnb-4bit",
-        "unsloth/llama-3.1-70b-unsloth-bnb-4bit",
-        "unsloth/llama-3.1-405b-unsloth-bnb-4bit",
-        # Llama 3
-        "unsloth/llama-3-8b-bnb-4bit",
-        "unsloth/llama-3-70b-bnb-4bit",
-        # Qwen 2.5
-        "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
-        "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit",
-        "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
-        "unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
-        "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
-        "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
-        "unsloth/Qwen2.5-72B-Instruct-bnb-4bit",
-        # Mistral
-        "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
-        "unsloth/mistral-7b-v0.3-bnb-4bit",
-        # Gemma 2
-        "unsloth/gemma-2-2b-bnb-4bit",
-        "unsloth/gemma-2-9b-bnb-4bit",
-        "unsloth/gemma-2-27b-bnb-4bit",
-        # Phi-3
-        "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
-        "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
-        # Phi-4
-        "unsloth/Phi-4-mini-instruct-bnb-4bit",
-        "unsloth/Phi-4",
-        # Yi
-        "unsloth/Yi-1.5-6B-Chat-bnb-4bit",
-        "unsloth/Yi-1.5-9B-Chat-bnb-4bit",
-        "unsloth/Yi-1.5-34B-Chat-bnb-4bit",
-        # DeepSeek
-        "unsloth/DeepSeek-Coder-V2-Instruct-bnb-4bit",
-        "unsloth/DeepSeek-V2-Chat-bnb-4bit",
-        # Command-R
-        "unsloth/Command-R7B-8k-bnb-4bit",
-        # Falcon
-        "unsloth/falcon-7b-instruct-bnb-4bit",
-        # Starling
-        "unsloth/Starling-LM-7B-alpha-bnb-4bit",
-        # OLMo
-        "unsloth/OLMo-7B-Instruct-bnb-4bit",
-    ]
+    """Get flattened list of currently supported models."""
+    return get_all_model_choices()
 
 
 def get_model_families():
@@ -421,21 +401,21 @@ def get_model_families():
             "unsloth/Llama-4-Maverick-17B-128E-Instruct",
         ],
         "Llama 3.3": [
-            "unsloth/Llama-3.3-70B-Instruct",
+            "unsloth/Llama-3.3-70B-Instruct-bnb-4bit",
         ],
         "Llama 3.2": [
             "unsloth/Llama-3.2-1B-Instruct",
             "unsloth/Llama-3.2-3B-Instruct",
-            "unsloth/Llama-3.2-11B-Vision-Instruct",
-            "unsloth/Llama-3.2-90B-Vision-Instruct",
+            "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+            "unsloth/Llama-3.2-90B-Vision-Instruct-bnb-4bit",
         ],
         "Llama 3.1": [
-            "unsloth/Meta-Llama-3.1-8B-Instruct",
-            "unsloth/Meta-Llama-3.1-70B-Instruct",
-            "unsloth/Meta-Llama-3.1-405B-Instruct",
+            "unsloth/Llama-3.1-8B-Instruct-bnb-4bit",
+            "unsloth/Llama-3.1-70B-bnb-4bit",
+            "unsloth/Llama-3.1-405B-bnb-4bit",
         ],
         "Llama 3": [
-            "unsloth/llama-3-8b-Instruct",
+            "unsloth/llama-3-8b-Instruct-bnb-4bit",
             "unsloth/llama-3-70b-bnb-4bit",
         ],
         "Llama 2": [
@@ -479,11 +459,11 @@ def get_model_families():
             "unsloth/Qwen2.5-VL-72B-Instruct",
         ],
         "Qwen 2.5 Coder": [
-            "unsloth/Qwen2.5-Coder-0.5B-Instruct",
-            "unsloth/Qwen2.5-Coder-1.5B-Instruct",
-            "unsloth/Qwen2.5-Coder-3B-Instruct",
-            "unsloth/Qwen2.5-Coder-7B-Instruct",
-            "unsloth/Qwen2.5-Coder-14B-Instruct",
+            "unsloth/Qwen2.5-Coder-0.5B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-Coder-1.5B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-Coder-3B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-Coder-7B-Instruct-bnb-4bit",
+            "unsloth/Qwen2.5-Coder-14B-Instruct-bnb-4bit",
         ],
         # Mistral
         "Mistral": [
@@ -516,14 +496,14 @@ def get_model_families():
             "unsloth/gemma-2-27b-it-bnb-4bit",
         ],
         "CodeGemma": [
-            "unsloth/CodeGemma-7b-bnb-4bit",
+            "unsloth/codegemma-7b-bnb-4bit",
         ],
         # Phi
         "Phi": [
             "unsloth/Phi-3.5-mini-instruct-bnb-4bit",
             "unsloth/Phi-3-medium-4k-instruct-bnb-4bit",
             "unsloth/Phi-4-mini-instruct-bnb-4bit",
-            "unsloth/Phi-4",
+            "unsloth/phi-4-bnb-4bit",
         ],
         # DeepSeek
         "DeepSeek R1": [
