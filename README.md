@@ -38,61 +38,21 @@ export HF_TOKEN=your_token_here
 
 ## Supported Models
 
-The app supports 100+ models from Unsloth's model catalog. Select by family in the UI:
+The UI model picker is aligned to the naming used in the official [Unsloth notebooks](https://github.com/unslothai/notebooks), including 4-bit variants where notebooks use them (for example `...-bnb-4bit`).
 
-### Llama
-- **Llama 4**: Scout 17B, Maverick 17B
-- **Llama 3.3**: 70B
-- **Llama 3.2**: 1B, 3B, 11B Vision, 90B Vision
-- **Llama 3.1**: 8B, 70B, 405B
-- **Llama 3**: 8B, 70B
-- **Llama 2**: 7B, 13B
-- **CodeLlama**: 7B, 13B, 34B
+Model families currently included in the dropdown:
+- Llama (3, 3.1, 3.2 Vision, 3.3, 4)
+- Qwen (Qwen3, Qwen3-VL, Qwen2.5, Qwen2.5-VL, Qwen2.5-Coder)
+- Mistral (Mistral 7B, Ministral 3, Mistral Large)
+- Gemma (Gemma 2, Gemma 3, Gemma 3n, CodeGemma)
+- Phi
+- DeepSeek
+- Yi
+- Granite
+- gpt-oss
+- Other (Command-R, Falcon, Starling, OLMo, Liquid)
 
-### Qwen
-- **Qwen 3**: 0.6B, 1.7B, 4B, 8B, 14B, 30B-A3B, 32B
-- **Qwen 3 VL**: 2B, 4B, 8B, 32B
-- **Qwen 2.5**: 0.5B to 72B
-- **Qwen 2.5 VL**: 3B, 7B, 32B, 72B
-- **Qwen 2.5 Coder**: 0.5B to 14B
-
-### Mistral
-- **Mistral**: 7B v0.3
-- **Mistral 3 (Ministral)**: 3B, 8B, 14B
-- **Mistral Large**: 675B
-
-### Gemma
-- **Gemma 3**: 270M, 1B, 4B, 12B, 27B
-- **Gemma 3n**: E2B, E4B
-- **Gemma 2**: 2B, 9B, 27B
-- **CodeGemma**: 7B
-- **FunctionGemma**: 270M
-- **MedGemma**: 4B, 27B
-
-### Phi
-- **Phi-3.5**: Mini
-- **Phi-3**: Medium
-- **Phi-4**: Mini, 14B
-
-### DeepSeek
-- **DeepSeek R1**: Distill versions (Llama 8B, 70B / Qwen 1.5B to 32B)
-- **DeepSeek V3**: V3, V3-0324
-- **DeepSeek Coder**: V2
-
-### Yi
-- **Yi 1.5**: 6B, 9B, 34B
-
-### Other Models
-- **Granite**: 4.0 H-Small
-- **gpt-oss**: 20B, 120B
-- **Command-R**: 7B
-- **Falcon**: 7B
-- **Starling**: 7B
-- **OLMo**: 7B
-- **Liquid**: 1.6 series (7B, 8x7B, 70B)
-
-### Custom Models
-You can also enter any Hugging Face model directly in the "Custom Model" field.
+You can also enter any Hugging Face model directly in the **Custom Model** field. The app resolves common legacy aliases to notebook-compatible model IDs automatically during preview and training.
 
 ## Supported Dataset Formats
 
